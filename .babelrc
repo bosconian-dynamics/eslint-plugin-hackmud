@@ -1,0 +1,16 @@
+{
+  "plugins": [
+    "add-module-exports"
+  ],
+  "presets": [
+    [
+      "env",
+      {
+        "targets": {
+          "node": 4
+        },
+        "modules": "commonjs"
+      }
+    ]
+  ]
+}
