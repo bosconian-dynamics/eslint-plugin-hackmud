@@ -11,7 +11,7 @@ Currently adds various rules for permitting and validating subscript syntax as w
 Install the [ESLint](http://eslint.org) linter and the `eslint-plugin-hackmud2`, either locally or globally - if you don't know the difference I recommend the latter:
 
 ```
-$ npm install --global eslint eslint-plugin-hackmud
+$ npm install --global eslint eslint-plugin-hackmud2
 ```
 
 ## Usage
