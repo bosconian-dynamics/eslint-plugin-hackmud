@@ -104,7 +104,15 @@ export const validateSubscriptIdentifier = ( context, node, identifier ) => {
 }
 
 export const create = ( context ) => ({
-  "ReturnStatement > FunctionExpression CallExpression": (node) => {
+  //TODO: there's got to be a better way to select these - or maybe break it up into multiple selectors
+  "ReturnStatement > FunctionExpression CallExpression Identifier[name=/^\\$S_.*/]": (node) => {
+    while( node.type != 'CallExpression' ) {
+      if( ['Property', 'ObjectExpression'].includes( node.type ) )
+         return
+
+      node = node.parent
+    }
+
     let callee = node.callee.object;
     if (callee.name.indexOf('$S_') != 0)
       return;

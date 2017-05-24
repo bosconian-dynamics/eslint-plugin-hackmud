@@ -1,5 +1,6 @@
 {
   "env": {
+    "es6": true,
     "hackmud2/hackmud": true
   },
   "extends": "eslint:recommended",
