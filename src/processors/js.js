@@ -21,10 +21,10 @@ function post( messages, filename ) {
       return message
     })
     .filter( ( msg, i, msgs ) => {
-      if( msg.ruleId == 'no-unreachable' && msgs.some( m => m.ruleId == 'hackmud/no-closure-siblings' && m.line == msg.line ) )
+      if( msg.ruleId == 'no-unreachable' && msgs.some( m => m.ruleId == 'hackmud2/no-closure-siblings' && m.line == msg.line ) )
         return false
 
-      if( msg.ruleId == 'no-undef' && msgs.some( m => m.ruleId == 'hackmud/validate-subscript-syntax' && m.line == msg.line ) )
+      if( msg.ruleId == 'no-undef' && msgs.some( m => m.ruleId == 'hackmud2/validate-subscript-syntax' && m.line == msg.line ) )
         return false
 
       return true

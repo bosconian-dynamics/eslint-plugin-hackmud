@@ -1,6 +1,6 @@
 {
   "env": {
-    "hackmud/hackmud": true
+    "hackmud2/hackmud2": true
   },
   "extends": "eslint:recommended",
   "rules": {

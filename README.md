@@ -1,4 +1,4 @@
-# eslint-plugin-hackmud
+# eslint-plugin-hackmud2
 
 Linting rules for hackmud scripts.
 
@@ -8,7 +8,7 @@ Currently adds various rules for permitting and validating subscript syntax as w
 
 ## Installation
 
-Install the [ESLint](http://eslint.org) linter and the `eslint-plugin-hackmud`, either locally or globally - if you don't know the difference I recommend the latter:
+Install the [ESLint](http://eslint.org) linter and the `eslint-plugin-hackmud2`, either locally or globally - if you don't know the difference I recommend the latter:
 
 ```
 $ npm install --global eslint eslint-plugin-hackmud
@@ -16,16 +16,16 @@ $ npm install --global eslint eslint-plugin-hackmud
 
 ## Usage
 
-To activate `eslint-plugin-hackmud`, create a `.eslintrc.json` configuration file in the directories containing the script sources which you'd like to lint. Alternately, if all of your scripts are in the standard `hackmud/{username}/scripts` location, you can place a single configuration file in `hackmud`, which will apply the configuration for all subdirectories.
+To activate `eslint-plugin-hackmud2`, create a `.eslintrc.json` configuration file in the directories containing the script sources which you'd like to lint. Alternately, if all of your scripts are in the standard `hackmud/{username}/scripts` location, you can place a single configuration file in `hackmud`, which will apply the configuration for all subdirectories.
 
-Add `hackmud` to the plugins section of your `.eslintrc.json` configuration file, and `"plugin:hackmud/recommended"` as the base configuration:
+Add `hackmud2` to the plugins section of your `.eslintrc.json` configuration file, and `"plugin:hackmud2/recommended"` as the base configuration:
 
 ```json
 {
   "plugins": [
-    "hackmud"
+    "hackmud2"
   ],
-  "extends": "plugin:hackmud/recommended"
+  "extends": "plugin:hackmud2/recommended"
 }
 ```
 
