@@ -1,6 +1,6 @@
 {
   "name": "eslint-plugin-hackmud2",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "description": "Linting rules for hackmud player-scripts",
   "keywords": [
     "eslint",

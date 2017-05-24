@@ -9,155 +9,165 @@ export const meta = {
   schema: [] // no options
 }
 
-export const getPropertyPath = ( node ) => {
-  if( node.type == 'Identifier' )
-    return [node.name];
+export const getSubscript = ( node ) => {
+  let identifier = [ node.name.substr(3) ]
+  let root = node;
 
-  if( node.type == 'MemberExpression' )
-    return getPropertyPath( node.object ).concat( getPropertyPath( node.property ) );
+  while ( root.parent.type == 'MemberExpression' ) {
+    identifier.push( root.parent.property.name )
+    root = root.parent;
+  }
 
-  if( node.type == 'CallExpression' )
-    return getPropertyPath( node.callee );
-
-  throw new Error( 'Cannot handle AST node type ' + node.type );
+  return {
+    identifier,
+    root: root.parent,
+    node
+  }
 }
 
-export const validateSubscriptIdentifier = ( context, node, identifier ) => {
-  if (!identifier.length) {
+export const validateIdentifier = ( context, subscript ) => {
+  let {identifier, root, node} = subscript
+
+  if( !identifier.length || !identifier[0] ) {
     return context.report({
       message: 'Missing subscript identifier',
-      node: node,
-      loc: {
-        start: {
-          line: node.loc.start.line,
-          column: node.loc.start.column + 3
-        },
-        end: node.loc.end
-      }
-    });
+      node: node
+    })
   }
 
-  let user = /^([a-z][a-zA-Z0-9_]*)[$\W.]/.exec(identifier);
-  if (!user) {
+  if( identifier.length > 2 ) {
+    context.report({
+      message: `Invalid subscript identifier`,
+      node: root
+    })
+  }
+
+  let user = subscript.user = identifier[0]
+  let script = subscript.script = identifier[1]
+  identifier = subscript.identifier = identifier.join( '.' )
+
+  if( !/^[a-z][a-z0-9_]*$/.test( user ) ) {
     context.report({
       message: 'Invalid username for subscript #s.' + identifier,
-      node: node,
-      loc: {
-        start: {
-          line: node.loc.start.line,
-          column: node.loc.start.column + 3
-        },
-        end: node.loc.end
-      }
-    });
-  } else {
-    user = user[1];
+      node: root
+    })
   }
 
-  let script = identifier.substr( identifier.indexOf( '.' ) + 1 );
-  if (!identifier.includes('.') || !script.length) {
+  if( !script ) {
     return context.report({
-      message: 'Missing script name for subscript #s.' + identifier ,
-      node: node,
-      loc: {
-        start: {
-          line: node.loc.start.line,
-          column: node.loc.start.column + 3 + (user ? user.length : identifier.length)
-        },
-        end: node.loc.end
-      }
-    });
+      message: 'Missing script name for subscript #s.' + identifier,
+      node: root
+    })
   }
 
-  if (script.includes('.')) {
-    return context.report({
-      message: 'Invalid syntax for scriptor #s.' + identifier,
-      node: node,
-      loc: {
-        start: {
-          line: node.loc.start.line,
-          column: node.loc.start.column + 3
-        },
-        end: node.loc.end
-      }
-    });
-  }
-
-  script = /^[a-z][a-zA-Z0-9_]*$/.exec(script);
-  if (!script) {
-    return context.report({
+  if( !/^[a-z][a-z0-9_]*$/.test( user ) ) {
+    context.report({
       message: 'Invalid script name for subscript #s.' + identifier,
-      node: node,
-      loc: {
-        start: {
-          line: node.loc.start.line,
-          column: node.loc.start.column + 4 + user.length
-        },
-        end: node.loc.end
-      }
-    });
-  } else {
-    script = script[0];
+      node: root
+    })
   }
 
-  return {user: user, script: script};
+  return subscript
 }
 
-export const create = ( context ) => ({
-  //TODO: there's got to be a better way to select these - or maybe break it up into multiple selectors
-  "ReturnStatement > FunctionExpression CallExpression Identifier[name=/^\\$S_.*/]": (node) => {
-    while( node.type != 'CallExpression' ) {
-      if( ['Property', 'ObjectExpression'].includes( node.type ) )
-         return
+export const create = ( context ) => {
+  let globalScope;
 
-      node = node.parent
+  /**
+   * makeDefined() - Force define identifiers on the fly.
+   * Borrowed from https://github.com/gajus/eslint-plugin-flowtype/blob/1edcaec087695482c0a860bead6bfa4f19c15ea3/src/rules/defineFlowType.js
+   *
+   * Copyright (c) 2015, Gajus Kuizinas (http://gajus.com/)
+   * All rights reserved.
+   *
+   * Redistribution and use in source and binary forms, with or without
+   * modification, are permitted provided that the following conditions are met:
+   *  * Redistributions of source code must retain the above copyright
+   *    notice, this list of conditions and the following disclaimer.
+   *  * Redistributions in binary form must reproduce the above copyright
+   *    notice, this list of conditions and the following disclaimer in the
+   *    documentation and/or other materials provided with the distribution.
+   *  * Neither the name of the Gajus Kuizinas (http://gajus.com/) nor the
+   *    names of its contributors may be used to endorse or promote products
+   *    derived from this software without specific prior written permission.
+   *
+   * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+   * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+   * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+   * DISCLAIMED. IN NO EVENT SHALL ANUARY BE LIABLE FOR ANY
+   * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+   * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+   * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+   * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+   * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+   * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+   */
+  const makeDefined = (ident) => {
+    let ii;
+
+    // start from the right since we're going to remove items from the array
+    for (ii = globalScope.through.length - 1; ii >= 0; ii--) {
+      const ref = globalScope.through[ii];
+
+      if (ref.identifier.name === ident.name) {
+        // use "__defineGeneric" since we don't have a reference to "escope.Variable"
+        globalScope.__defineGeneric( // eslint-disable-line no-underscore-dangle
+          ident.name,
+          globalScope.set,
+          globalScope.variables
+        );
+        const variable = globalScope.set.get(ident.name);
+
+        variable.writeable = false;
+        // "through" contains all references whose definition cannot be found
+        // so we need to update references and remove the ones that were added
+        globalScope.through.splice(ii, 1);
+        ref.resolved = variable;
+        variable.references.push(ref);
+      }
     }
+  };
 
-    let callee = node.callee.object;
-    if (callee.name.indexOf('$S_') != 0)
-      return;
+  return {
+    "Program": () => globalScope = context.getScope(),
+    "ReturnStatement > FunctionExpression Identifier[name=/^\\$S_/]": ( node ) => {
+      let subscript = validateIdentifier( context, getSubscript( node ) )
+      if( !subscript )
+        return
 
-    let identifier = getPropertyPath( node ).join('.').substr( 3 );
-    let subscript = validateSubscriptIdentifier( context, callee, identifier );
+      let { root, identifier, user } = subscript;
+      if( root.type != 'CallExpression' ) {
+        return context.report({
+          message: 'Missing calling parenthesis',
+          node: node
+        })
+      }
 
-    if( !subscript )
-      return;
+      let nextToken = context.getTokenAfter( root.callee )
+      if( nextToken.value != '(' ) {
+        return context.report({
+          message: 'Unexpected {{ type }} {{ token }} Expected: (',
+          node: root,
+          data: {
+            type: nextToken.type,
+            token: nextToken.value
+          }
+        })
+      }
 
-    let callLeftParen = context.getTokenAfter( node.callee );
+      let source = context.getSourceCode()
+      if ( source.isSpaceBetweenTokens( root.callee, nextToken ) ) {
+        return context.report({
+          message: 'Unexpected whitespace between subscript identifier and call',
+          node: root
+        })
+      }
 
-    if (callLeftParen.value != '(') {
-      return context.report({
-        message: 'Unexpected {{ type }} {{ token }} Expected: (',
-        node: callee,
-        loc: {
-          start: {
-            line: callee.loc.start.line,
-            column: callee.loc.start.column + 3 + identifier.length
-          },
-          end: callee.loc.end
-        },
-        data: {
-          type: callLeftParen.type,
-          token: callLeftParen.value
-        }
-      });
-    }
-
-    if (callLeftParen.start - node.callee.end) {
-      return context.report({
-        message: 'Unexpected whitespace between subscript identifier and calling paranthesis',
-        node: callee,
-        loc: {
-          start: {
-            line: callee.loc.start.line,
-            column: callLeftParen.start
-          },
-          end: callee.loc.end
-        }
-      });
+      // If the scriptor's valid, mark it as "defined" to avoid no-undef hints
+      makeDefined( node )
     }
   }
-})
+}
 
 export default {
   meta,
