@@ -14,8 +14,8 @@
     "no-global-assign": "error",
     "no-implied-eval": "error",
     "no-global-return": "off",
-    "hackmud/validate-subscript-syntax": "error",
-    "hackmud/no-closure-identifier": "error",
-    "hackmud/no-closure-siblings": "error"
+    "hackmud2/validate-subscript-syntax": "error",
+    "hackmud2/no-closure-identifier": "error",
+    "hackmud2/no-closure-siblings": "error"
   }
 }
