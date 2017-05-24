@@ -14,6 +14,6 @@ export default {
   processors,
   configs,
   environments: {
-    hackmud2: environment
+    hackmud: environment
   },
 }
