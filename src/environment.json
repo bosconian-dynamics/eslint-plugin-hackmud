@@ -18,6 +18,13 @@
     "$S_sys": false,
     "$S_trust": false,
     "$S_users": false,
-    "$D_": false
+    "$DB_": false,
+    "$DB_i": false,
+    "$DB_r": false,
+    "$DB_f": false,
+    "$DB_u": false,
+    "$DB_u1": false,
+    "$D": false,
+    "_START": false
   }
 }

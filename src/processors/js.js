@@ -1,8 +1,12 @@
-import { SUBSCRIPT_PREFIX } from '../config.js'
+import { SUBSCRIPT_PREFIX, DATABASE_PREFIX, DEBUG_GLOBAL } from '../config.js'
 
 function pre( text, filename ) {
   // TODO: handle multiple top-level anonymous closures
-  text = text.replace( /#s\./g, SUBSCRIPT_PREFIX )
+  text = text
+    .replace( /#s\./g, SUBSCRIPT_PREFIX )
+    .replace( /#db./g, DATABASE_PREFIX )
+    .replace( /#D/g, DEBUG_GLOBAL )
+
   return [`return ${text}`]
 }
 
@@ -12,11 +16,15 @@ function post( messages, filename ) {
       if( message.line == 1 )
         message.column -= 7
 
-      if( message.source.includes( SUBSCRIPT_PREFIX ) )
-        message.source = message.source.replace( SUBSCRIPT_PREFIX, '#s.' )
+      message.source = message.source
+        .replace( SUBSCRIPT_PREFIX, '#s.' )
+        .replace( DATABASE_PREFIX, '#db.' )
+        .replace( DEBUG_GLOBAL, '#D' )
 
-      if( message.message.includes( SUBSCRIPT_PREFIX ) )
-        message.message = message.message.replace( SUBSCRIPT_PREFIX, '#s.' )
+      message.message = message.message
+        .replace( SUBSCRIPT_PREFIX, '#s.' )
+        .replace( DATABASE_PREFIX, '#db.' )
+        .replace( DEBUG_GLOBAL, '#D' )
 
       return message
     })

@@ -4,7 +4,12 @@ Linting rules for hackmud scripts.
 
 ## Features
 
-Currently adds various rules for permitting and validating subscript syntax as well as the anonymous top-level script closure. They're somewhat hackish, at the moment - the largest caveats are that your script cannot contain `$S_`, and `#db` calls are not implemented at this point.
+ - Permits subscript syntax `#s.user.script()`
+ - Validates subscript syntax
+ - Permits `#db` calls
+ - Defines hackmud global `_START`
+
+This plugin is somewhat hackish, at the moment - the largest caveat is that linted scripts should not contain `$S_`, `$DB_`, or `$D`.
 
 ## Installation
 
