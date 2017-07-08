@@ -1,5 +1,7 @@
 # eslint-plugin-hackmud2
 
+[![npm](https://img.shields.io/npm/v/eslint-plugin-hackmud2.svg?style=plastic)](https://www.npmjs.com/package/eslint-plugin-hackmud2) [![license](https://img.shields.io/github/license/KuroTsuto/eslint-plugin-hackmud.svg?style=plastic)](https://github.com/KuroTsuto/eslint-plugin-hackmud/blob/master/LICENSE.md) [![npm](https://img.shields.io/npm/dt/eslint-plugin-hackmud2.svg?style=plastic)](https://www.npmjs.com/package/eslint-plugin-hackmud2) 
+
 Linting rules for hackmud scripts.
 
 ## Features
