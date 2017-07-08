@@ -1,11 +1,19 @@
-import { SUBSCRIPT_PREFIX, DATABASE_PREFIX, DEBUG_GLOBAL } from '../config.js'
+import {
+  SUBSCRIPT_PREFIX,
+  DATABASE_PREFIX,
+  PREPROC_G,
+  PREPROC_D,
+  PREPROC_FMCL
+} from '../config.js'
 
 function pre( text, filename ) {
   // TODO: handle multiple top-level anonymous closures
   text = text
     .replace( /#s\./g, SUBSCRIPT_PREFIX )
     .replace( /#db./g, DATABASE_PREFIX )
-    .replace( /#D/g, DEBUG_GLOBAL )
+    .replace( /#D/g, PREPROC_D )
+    .replace( /#G/g, PREPROC_G )
+    .replace( /#FMCL/g, PREPROC_FMCL )
 
   return [`return ${text}`]
 }
@@ -19,12 +27,16 @@ function post( messages, filename ) {
       message.source = message.source
         .replace( SUBSCRIPT_PREFIX, '#s.' )
         .replace( DATABASE_PREFIX, '#db.' )
-        .replace( DEBUG_GLOBAL, '#D' )
+        .replace( PREPROC_D, '#D' )
+        .replace( PREPROC_G, '#G' )
+        .replace( PREPROC_FMCL, '#FMCL' )
 
       message.message = message.message
         .replace( SUBSCRIPT_PREFIX, '#s.' )
         .replace( DATABASE_PREFIX, '#db.' )
-        .replace( DEBUG_GLOBAL, '#D' )
+        .replace( PREPROC_D, '#D' )
+        .replace( PREPROC_G, '#G' )
+        .replace( PREPROC_FMCL, '#FMCL' )
 
       return message
     })

@@ -25,6 +25,12 @@
     "$DB_u": false,
     "$DB_u1": false,
     "$D": false,
-    "_START": false
+    "$G": false,
+    "$FMCL": false,
+    "_START": false,
+    "_TIMEOUT": false,
+    "c": false,
+    "a": false,
+    "e": false
   }
 }
