@@ -8,16 +8,6 @@
     }
   },
   "globals": {
-    "$S_accts": false,
-    "$S_autos": false,
-    "$S_chats": false,
-    "$S_corps": false,
-    "$S_escrow": false,
-    "$S_market": false,
-    "$S_scripts": false,
-    "$S_sys": false,
-    "$S_trust": false,
-    "$S_users": false,
     "$DB_": false,
     "$DB_i": false,
     "$DB_r": false,

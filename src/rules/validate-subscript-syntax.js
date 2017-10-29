@@ -2,15 +2,17 @@ import { SUBSCRIPT_PREFIX } from '../config.js'
 
 export const meta = {
   docs: {
-      description: "disallow script closure identifier",
+      description: "validate subscript directive syntax",
       category: "Possible Errors",
       recommended: true
   },
   schema: [] // no options
 }
 
-export const getSubscript = ( node ) => {
-  let identifier = [ node.name.substr(3) ]
+export const subscriptInfo = ( node ) => {
+  let sub = /^\$(\w?S)_/.exec( node.name )
+  let secLevel = sub[1]
+  let identifier = [ node.name.substr( secLevel.length + 2 ) ]
   let root = node;
 
   while ( root.parent.type == 'MemberExpression' ) {
@@ -19,20 +21,21 @@ export const getSubscript = ( node ) => {
   }
 
   return {
+    secLevel,
     identifier,
     root: root.parent,
     node
   }
 }
 
-export const validateIdentifier = ( context, subscript ) => {
-  let {identifier, root, node} = subscript
-
+export const validateIdentifier = ( context, {secLevel, identifier, root, node} ) => {
   if( !identifier.length || !identifier[0] ) {
-    return context.report({
+    context.report({
       message: 'Missing subscript identifier',
       node: node
     })
+
+    return false
   }
 
   if( identifier.length > 2 ) {
@@ -40,34 +43,53 @@ export const validateIdentifier = ( context, subscript ) => {
       message: `Invalid subscript identifier`,
       node: root
     })
+
+    return false
   }
 
-  let user = subscript.user = identifier[0]
-  let script = subscript.script = identifier[1]
-  identifier = subscript.identifier = identifier.join( '.' )
+  let user = identifier[0]
+  let script = identifier[1]
+  let subscript = '#' + secLevel.toLowerCase() + '.' + identifier.join( '.' )
 
-  if( !/^[a-z][a-z0-9_]*$/.test( user ) ) {
+  if( !/^[a-z0-9_]*$/.test( user ) ) {
     context.report({
-      message: 'Invalid username for subscript #s.' + identifier,
+      message: 'Invalid username for subscript ' + subscript,
       node: root
     })
   }
 
   if( !script ) {
-    return context.report({
-      message: 'Missing script name for subscript #s.' + identifier,
+    context.report({
+      message: 'Missing script name for subscript ' + subscript,
       node: root
     })
+
+    return false
   }
 
   if( !/^[a-z][a-z0-9_]*$/.test( user ) ) {
     context.report({
-      message: 'Invalid script name for subscript #s.' + identifier,
+      message: 'Invalid script name for subscript ' + subscript,
       node: root
     })
+
+    return false
   }
 
-  return subscript
+  return true
+}
+
+export const validateSecLevel = ( context, {secLevel, identifier, root} ) => {
+  if( ![ 'F', 'H', 'M', 'L', 'N', '4', '3', '2', '1', '0' ].includes( secLevel[0] ) ) {
+    context.report({
+      message: 'Invalid security level for subscript #' + secLevel.toLowerCase() + '.' + identifier.join('.'),
+      node: root
+    })
+
+    return false
+  }
+
+  return true
 }
 
 export const create = ( context ) => {
@@ -130,12 +152,20 @@ export const create = ( context ) => {
 
   return {
     "Program": () => globalScope = context.getScope(),
-    "ReturnStatement > FunctionExpression Identifier[name=/^\\$S_/]": ( node ) => {
-      let subscript = validateIdentifier( context, getSubscript( node ) )
-      if( !subscript )
+    "ReturnStatement > FunctionExpression Identifier[name=/^\\$S_/]": ( node ) => context.report(
+      {
+        message: 'Deprecated syntax: missing security level identifier',
+        node
+      }
+    ),
+    "ReturnStatement > FunctionExpression Identifier[name=/^\\$\\wS_/]": ( node ) => {
+      let sinfo = subscriptInfo( node )
+
+      if( !validateSecLevel( context, sinfo ) || !validateIdentifier( context, sinfo ) )
         return
 
-      let { root, identifier, user } = subscript;
+      let { root, identifier } = sinfo;
+
       if( root.type != 'CallExpression' ) {
         return context.report({
           message: 'Missing calling parenthesis',
