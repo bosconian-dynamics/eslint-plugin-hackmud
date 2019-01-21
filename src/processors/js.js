@@ -9,7 +9,7 @@ import {
 function pre( text, filename ) {
   // TODO: handle multiple top-level anonymous closures
   text = text
-    .replace( /#(\w)?s\./g, '$$1S_' )
+    .replace( /#(\w)?s\./g, '$$$1S_' )
     .replace( /#db\./g, DATABASE_PREFIX )
     .replace( /#D/g, PREPROC_D )
     .replace( /#G/g, PREPROC_G )
@@ -24,15 +24,15 @@ function post( messages, filename ) {
       if( message.line == 1 )
         message.column -= 7
 
-      message.source = message.source
+      /*message.source = message.source
         .replace( /$(\w?S_)/g, '#s.' )
         .replace( DATABASE_PREFIX, '#db.' )
         .replace( PREPROC_D, '#D' )
         .replace( PREPROC_G, '#G' )
-        .replace( PREPROC_FMCL, '#FMCL' )
+        .replace( PREPROC_FMCL, '#FMCL' )*/
 
       message.message = message.message
-        .replace( /$(\w?S_)/g, '#s.' )
+        .replace( /$(\w?S_)/g, '#$1s.' )
         .replace( DATABASE_PREFIX, '#db.' )
         .replace( PREPROC_D, '#D' )
         .replace( PREPROC_G, '#G' )

@@ -1,0 +1,10 @@
+{
+    "parserOptions": {
+        "sourceType": "module"
+    },
+    "env": {
+        "node": true,
+        "browser": false
+    },
+    "root": true
+}

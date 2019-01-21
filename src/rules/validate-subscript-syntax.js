@@ -80,7 +80,7 @@ export const validateIdentifier = ( context, {secLevel, identifier, root, node} 
 }
 
 export const validateSecLevel = ( context, {secLevel, identifier, root} ) => {
-  if( ![ 'F', 'H', 'M', 'L', 'N', '4', '3', '2', '1', '0' ].includes( secLevel[0] ) ) {
+  if( ![ 'F', 'H', 'M', 'L', 'N', '4', '3', '2', '1', '0' ].includes( secLevel[0].toUpperCase() ) ) {
     context.report({
       message: 'Invalid security level for subscript #' + secLevel.toLowerCase() + '.' + identifier.join('.'),
       node: root
