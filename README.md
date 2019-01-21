@@ -7,7 +7,7 @@ Linting rules for hackmud scripts.
 ## Features
 
  - Permits and validates code enclosure in single top-level anonymous function
- - Permits subscript syntax `#fs.user.script()`, `#f4.user.script()`
+ - Permits subscript syntax `#fs.user.script()`, `#4s.user.script()`
  - Limited validation of subscript syntax
  - Permits `#db` calls
  - Defines hackmud globals `_START`, `_TIMEOUT`, `_ST`, `_TO`, `_END`
