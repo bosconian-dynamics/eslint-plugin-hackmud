@@ -1,5 +1,6 @@
 import jsProcessor from './js'
 
 export default {
-  '.js': jsProcessor
+  '.js': jsProcessor,
+  '.ts': jsProcessor
 }
